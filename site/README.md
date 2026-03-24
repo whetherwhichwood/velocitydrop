@@ -34,18 +34,20 @@ Create `site/.env.local` (optional):
 
 ## Deploy on Vercel (GitHub)
 
-This repo is an npm **workspace** monorepo. The marketing app lives under `site/`. Vercel must **not** run the root `npm run build` (that builds the bot, API, and other packages).
+This repo is an npm **workspace** monorepo. The Next.js app lives under **`site/`** only. Vercel must treat **`site`** as the app root so it uses the **Next.js** builder (not a static “public folder” deploy).
 
-**Option A (recommended):**
+### Required settings
 
 1. Import the GitHub repo in Vercel.
-2. Set **Root Directory** to `site`.
-3. **Install Command** should install from the monorepo root so workspaces resolve: the repo includes [`site/vercel.json`](vercel.json) with `cd .. && npm install`. Vercel applies it when the project root is `site`.
-4. **Build Command** defaults to `npm run build` (Next.js) inside `site/`.
-5. Framework: Next.js (auto-detected).
-6. Add the environment variables above in the project settings.
-7. Deploy.
+2. **Settings → General → Root Directory** → set to **`site`** (Edit → select `site` → Save). This is required so `next.config.mjs` and `app/` are found and the output is handled as Next.js, not a static site.
+3. **Build & Development Settings** → **Framework Preset** should be **Next.js** (usually auto-detected once the root is `site`). **Output Directory** must stay **empty** (default for Next.js). If you previously set `public` or anything custom, clear it.
+4. **Install Command** is overridden by [`vercel.json`](vercel.json) in this folder: `cd .. && npm install` so the monorepo root installs all workspaces.
+5. **Build Command** can stay the default `npm run build` (runs `next build` in `site/`).
+6. Add the environment variables from the table above in **Settings → Environment Variables**.
+7. Redeploy.
 
-**Option B:** Leave the Vercel **Root Directory** at the repository root (`.`). The repo root [`vercel.json`](../vercel.json) sets `buildCommand` to `npm run build:site` so only the Next app builds.
+### If you see: “No Output Directory named public”
+
+That means Vercel is not using the Next.js preset (often because **Root Directory** was the repo root). Set **Root Directory** to **`site`**, clear **Output Directory**, save, and redeploy. Do **not** point output at `site/.next` manually for a standard Next.js app on Vercel.
 
 No Docker or database is required for this app.
