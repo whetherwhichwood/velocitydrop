@@ -56,7 +56,16 @@ The repo root [`vercel.json`](../vercel.json) also sets **`buildCommand`** to `n
 
 ### If you see: “No Output Directory named public”
 
-That means Vercel is not using the Next.js preset (often because **Root Directory** was the repo root). Set **Root Directory** to **`site`**, clear **Output Directory**, save, and redeploy. Do **not** point output at `site/.next` manually for a standard Next.js app on Vercel.
+Vercel is treating the deploy like a **static** site (it expects a build output folder named `public`) instead of **Next.js**.
+
+Do **all** of the following:
+
+1. **Settings → Build & Development → Output Directory** → leave **empty** (delete `public` or any custom value if it was set).
+2. **Framework Preset** → **Next.js** (not “Other” or “Other static”).
+3. **Root Directory** → **`site`** (strongly recommended). The app’s `app/`, `next.config.mjs`, and `public/` live there.
+4. Redeploy after saving.
+
+The repo also includes a **root** [`next.config.mjs`](../next.config.mjs) that re-exports the site config so Vercel can detect Next.js when the connected Git root is the monorepo root, plus root [`vercel.json`](../vercel.json) with `"framework": "nextjs"` and `buildCommand: npm run build:site`. If the error persists, **Root Directory = `site`** is the fix that always aligns with Vercel’s Next.js builder.
 
 No Docker or database is required for this app.
 
