@@ -1,0 +1,20 @@
+{
+  "name": "@velocitydrop/server-manager",
+  "version": "1.0.0",
+  "description": "Game server orchestration for VelocityDrop",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts"
+  },
+  "dependencies": {
+    "dockerode": "^4.0.0",
+    "@prisma/client": "^5.7.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}
+

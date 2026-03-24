@@ -1,0 +1,105 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  discordId     String    @unique
+  username      String?
+  tokenBalance  Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  gameServers   GameServer[]
+  transactions  TokenTransaction[]
+  allocations  ResourceAllocation[]
+
+  @@index([discordId])
+}
+
+model GameServer {
+  id            String    @id @default(cuid())
+  userId        String
+  name          String
+  gameType      String    // "valheim", "minecraft", etc.
+  status        String    @default("stopped") // "stopped", "starting", "running", "stopping", "error"
+  port          Int?
+  password      String?
+  config        Json?     // Game-specific configuration
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  instance      ServerInstance?
+
+  @@index([userId])
+  @@index([status])
+}
+
+model ServerInstance {
+  id                String    @id @default(cuid())
+  gameServerId      String    @unique
+  dockerContainerId String    @unique
+  startedAt         DateTime  @default(now())
+  stoppedAt         DateTime?
+  cpuCores          Float
+  ramGB             Float
+  diskGB            Float
+  port              Int
+
+  gameServer        GameServer @relation(fields: [gameServerId], references: [id], onDelete: Cascade)
+  allocation        ResourceAllocation?
+
+  @@index([dockerContainerId])
+}
+
+model TokenTransaction {
+  id          String    @id @default(cuid())
+  userId      String
+  amount      Int       // Positive for additions, negative for deductions
+  type        String    // "purchase", "spend", "admin_add", "admin_remove"
+  description String?
+  createdAt   DateTime  @default(now())
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model ResourcePool {
+  id            String    @id @default(cuid())
+  totalCpuCores Float
+  totalRamGB    Float
+  totalDiskGB   Float
+  availableCpuCores Float
+  availableRamGB    Float
+  availableDiskGB   Float
+  updatedAt     DateTime  @updatedAt
+}
+
+model ResourceAllocation {
+  id          String    @id @default(cuid())
+  userId      String
+  serverInstanceId String? @unique
+  cpuCores    Float
+  ramGB       Float
+  diskGB      Float
+  allocatedAt DateTime  @default(now())
+  releasedAt  DateTime?
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  instance    ServerInstance? @relation(fields: [serverInstanceId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([releasedAt])
+}
+
