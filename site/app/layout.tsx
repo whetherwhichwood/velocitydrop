@@ -14,7 +14,23 @@ const body = DM_Sans({
   display: 'swap',
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://velocitydrop.vercel.app';
+const SITE_FALLBACK = 'https://velocitydrop.vercel.app';
+
+/** Empty string env vars are common in .env templates; `new URL('')` throws and breaks the whole app. */
+function getPublicSiteOrigin(): string {
+  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (!raw) {
+    return SITE_FALLBACK;
+  }
+  try {
+    const withProtocol = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+    return new URL(withProtocol).origin;
+  } catch {
+    return SITE_FALLBACK;
+  }
+}
+
+const siteOrigin = getPublicSiteOrigin();
 
 export const metadata: Metadata = {
   title: {
@@ -23,12 +39,12 @@ export const metadata: Metadata = {
   },
   description:
     'Spin up dedicated game servers from Discord with tokens. Pay for play time, not idle months. More titles rolling out over time.',
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(siteOrigin),
   openGraph: {
     title: 'VelocityDrop · Game servers on demand',
     description:
       'Spin up dedicated game servers from Discord with tokens. Pay for play time, not idle months. More titles rolling out over time.',
-    url: siteUrl,
+    url: siteOrigin,
     siteName: 'VelocityDrop',
     locale: 'en_US',
     type: 'website',
