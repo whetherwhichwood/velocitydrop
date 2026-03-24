@@ -68,5 +68,5 @@ See `.env.example` for required environment variables.
 
 ### Vercel (marketing site)
 
-Deploy the **`site/`** directory as the Vercel project root. See [site/README.md](site/README.md) for environment variables and GitHub import steps.
+Do **not** rely on the root `npm run build` on Vercel (that builds bot, API, web, etc.). Either set the Vercel **Root Directory** to `site`, or use the root [`vercel.json`](vercel.json) `buildCommand` when the project root is the repo. Details: [site/README.md](site/README.md).
 

@@ -34,11 +34,18 @@ Create `site/.env.local` (optional):
 
 ## Deploy on Vercel (GitHub)
 
-1. Push this repository to GitHub (e.g. repo name `velocitydrop`).
-2. In Vercel: **Add New Project** → Import the GitHub repository.
-3. **Root Directory**: set to `site` (critical for this monorepo).
-4. Framework Preset: Next.js (auto-detected).
-5. Add the environment variables above in the Vercel project settings.
-6. Deploy.
+This repo is an npm **workspace** monorepo. The marketing app lives under `site/`. Vercel must **not** run the root `npm run build` (that builds the bot, API, and other packages).
+
+**Option A (recommended):**
+
+1. Import the GitHub repo in Vercel.
+2. Set **Root Directory** to `site`.
+3. **Install Command** should install from the monorepo root so workspaces resolve: the repo includes [`site/vercel.json`](vercel.json) with `cd .. && npm install`. Vercel applies it when the project root is `site`.
+4. **Build Command** defaults to `npm run build` (Next.js) inside `site/`.
+5. Framework: Next.js (auto-detected).
+6. Add the environment variables above in the project settings.
+7. Deploy.
+
+**Option B:** Leave the Vercel **Root Directory** at the repository root (`.`). The repo root [`vercel.json`](../vercel.json) sets `buildCommand` to `npm run build:site` so only the Next app builds.
 
 No Docker or database is required for this app.
