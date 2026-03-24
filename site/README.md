@@ -39,12 +39,20 @@ This repo is an npm **workspace** monorepo. The Next.js app lives under **`site/
 ### Required settings
 
 1. Import the GitHub repo in Vercel.
-2. **Settings → General → Root Directory** → set to **`site`** (Edit → select `site` → Save). This is required so `next.config.mjs` and `app/` are found and the output is handled as Next.js, not a static site.
+2. **Settings → General → Root Directory** → set to **`site`** (Edit → select `site` → Save). This is required so `next.config.mjs` and `app/` are found and the output is handled as Next.js, not a static site. It also ensures Vercel runs **`next build`** in `site/` only, not the monorepo root **`npm run build`** (which compiles the **bot**, **api**, etc.).
 3. **Build & Development Settings** → **Framework Preset** should be **Next.js** (usually auto-detected once the root is `site`). **Output Directory** must stay **empty** (default for Next.js). If you previously set `public` or anything custom, clear it.
 4. **Install Command** is overridden by [`vercel.json`](vercel.json) in this folder: `cd .. && npm install` so the monorepo root installs all workspaces.
 5. **Build Command** can stay the default `npm run build` (runs `next build` in `site/`).
 6. Add the environment variables from the table above in **Settings → Environment Variables**.
 7. Redeploy.
+
+### If you see: `npm error workspace @velocitydrop/bot` / `tsc` / `Command "npm run build" exited with 2`
+
+Vercel is running the **repository root** `npm run build`, which builds **every** workspace (bot → `tsc`, api, web, …). The marketing deploy must **not** do that.
+
+**Fix:** In Vercel → **Settings → General → Root Directory** → **`site`** → Save → Redeploy.
+
+The repo root [`vercel.json`](../vercel.json) also sets **`buildCommand`** to `npm run build:site` so if the project root is the **repo root** (`.`), the install/build still only produces the Next app. Prefer **Root Directory = `site`** so the Next.js framework preset and output are correct.
 
 ### If you see: “No Output Directory named public”
 

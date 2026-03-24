@@ -68,5 +68,5 @@ See `.env.example` for required environment variables.
 
 ### Vercel (marketing site)
 
-Set the Vercel project **Root Directory** to **`site`** so only the Next.js marketing app deploys (not the root `npm run build`). See [site/README.md](site/README.md) for install command, env vars, and fixing the “public” output directory error.
+Set the Vercel project **Root Directory** to **`site`** so Vercel runs **`next build`** there only. If the root is left at **`.`**, Vercel would run the monorepo **`npm run build`** (bot `tsc`, api, …) and fail. The root [`vercel.json`](vercel.json) sets **`buildCommand`** to `npm run build:site` as a safety net when the project root is the repo. Details: [site/README.md](site/README.md).
 
