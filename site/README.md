@@ -51,3 +51,7 @@ This repo is an npm **workspace** monorepo. The Next.js app lives under **`site/
 That means Vercel is not using the Next.js preset (often because **Root Directory** was the repo root). Set **Root Directory** to **`site`**, clear **Output Directory**, save, and redeploy. Do **not** point output at `site/.next` manually for a standard Next.js app on Vercel.
 
 No Docker or database is required for this app.
+
+### Build log: `npm warn deprecated …`
+
+During `npm install`, you may see deprecation notices for packages such as `rimraf`, `glob`, `inflight`, or `eslint@8`. Those come from **transitive dependencies** (often pulled in by `eslint` / `eslint-config-next`). They are **warnings**, not build failures, and are safe to ignore unless `npm install` exits with a non-zero code. The repo root [`.npmrc`](../.npmrc) turns off `fund` and `audit` summaries to keep CI logs shorter. Fully clearing those warnings usually means upgrading to **Next.js 15+** and **ESLint 9** when you are ready for a larger toolchain bump.
